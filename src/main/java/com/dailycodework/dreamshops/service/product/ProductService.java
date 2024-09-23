@@ -1,18 +1,18 @@
 package com.dailycodework.dreamshops.service.product;
 
-import com.dailycodework.dreamshops.exception.productNotFoundException;
+import com.dailycodework.dreamshops.exception.ProductNotFoundException;
 import com.dailycodework.dreamshops.model.Product;
-import com.dailycodework.dreamshops.repository.productRepository;
-import com.dailycodework.dreamshops.service.product.exception.productNotFoundException;
-import lombok.NoArgsConstructor;
+import com.dailycodework.dreamshops.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
-public class productService implements IproductService{
-    private productRepository productRepository;
+public class ProductService implements IproductService{
+    private final ProductRepository productRepository;
+
     @Override
     public Product addProduct(Product product) {
         return null;
@@ -21,12 +21,20 @@ public class productService implements IproductService{
     @Override
     public Product getProductById(Long id) {
         return productRepository.findById(id)
-                .orElse(()-> new productNotFoundException("Product not found"));
+                .orElseThrow();
     }
 
     @Override
     public void deleteProductById(Long id) {
-        productRepository.findById
+        productRepository.findById(id)
+                .ifPresentOrElse(productRepository::delete,
+                        () -> {
+                            try {
+                                throw new ProductNotFoundException("Product not found ");
+                            } catch (ProductNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
 
     }
 
@@ -37,7 +45,7 @@ public class productService implements IproductService{
 
     @Override
     public List<Product> getAllProducts() {
-        return List.of();
+        return productRepository.findAll();
     }
 
     @Override
@@ -46,13 +54,18 @@ public class productService implements IproductService{
     }
 
     @Override
+    public List<Product> getProductsByCategory(String category) {
+        return productRepository.findByCategoryName(category);
+    }
+
+    @Override
     public List<Product> getProductsByBrand(String brand) {
-        return List.of();
+        return productRepository.findByBrand(brand);
     }
 
     @Override
     public List<Product> getProductByCategoryAndBrand(String category, String brand) {
-        return List.of();
+        return productRepository.findByCategoryNameAndBrand(category,brand);
     }
 
     @Override
@@ -62,16 +75,16 @@ public class productService implements IproductService{
 
     @Override
     public List<Product> getProductByName(String name) {
-        return List.of();
+        return productRepository.findByName(name);
     }
 
     @Override
     public List<Product> getProductByBrandAndName(String brand, String name) {
-        return List.of();
+        return productRepository.findByBrandAndName(brand, name);
     }
 
     @Override
     public Long countProductByBrandAndName(String brand, String name) {
-        return 0;
+        return productRepository.countByBrandAndName(brand, name);
     }
 }
