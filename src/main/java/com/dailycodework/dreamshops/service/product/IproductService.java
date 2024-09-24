@@ -2,6 +2,7 @@ package com.dailycodework.dreamshops.service.product;
 
 import com.dailycodework.dreamshops.model.Product;
 import java.util.List;
+import ...
 
 public interface IproductService {
 //    method/functions in the  database and JPA will write for us the queries
